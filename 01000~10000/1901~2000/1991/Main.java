@@ -27,32 +27,22 @@ public class Main {
 			}
 		}
 
-		System.out.println(new Main().preorder(left, right, 0));
-		System.out.println(new Main().inorder(left, right, 0));
-		System.out.println(new Main().postorder(left, right, 0));
+		System.out.println(new Main().order(left, right, 0, "pre"));
+		System.out.println(new Main().order(left, right, 0, "in"));
+		System.out.println(new Main().order(left, right, 0, "post"));
 	}
 
-	public String preorder(int[] left, int[] right, int now) {
+	public String order(int[] left, int[] right, int now, String opt) {
 		if (now < 0) {
 			return "";
+		} else if (opt.equals("pre")) {
+			return (char) ('A' + now) + order(left, right, left[now], opt) + order(left, right, right[now], opt);
+		} else if (opt.equals("in")) {
+			return order(left, right, left[now], opt) + (char) ('A' + now) + order(left, right, right[now], opt);
+		} else if (opt.equals("post")) {
+			return order(left, right, left[now], opt) + order(left, right, right[now], opt) + (char) ('A' + now);
 		} else {
-			return (char) ('A' + now) + preorder(left, right, left[now]) + preorder(left, right, right[now]);
-		}
-	}
-
-	public String inorder(int[] left, int[] right, int now) {
-		if (now < 0) {
 			return "";
-		} else {
-			return inorder(left, right, left[now]) + (char) ('A' + now) + inorder(left, right, right[now]);
-		}
-	}
-
-	public String postorder(int[] left, int[] right, int now) {
-		if (now < 0) {
-			return "";
-		} else {
-			return postorder(left, right, left[now]) + postorder(left, right, right[now]) + (char) ('A' + now);
 		}
 	}
 }
