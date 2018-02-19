@@ -1,42 +1,36 @@
 package baekjoon;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.StringTokenizer;
+import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-		int n = Integer.parseInt(br.readLine());
-		int[] x = new int[n];
-		int[] y = new int[n];
-		Integer[] sort = new Integer[n];
-
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int[] p = new int[n];
 		for (int i = 0; i < n; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			x[i] = Integer.parseInt(st.nextToken());
-			y[i] = Integer.parseInt(st.nextToken());
-			sort[i] = i;
+			int x = sc.nextInt() + 10000;
+			int y = sc.nextInt() + 10000;
+			p[i] = x * 20001 + y;
 		}
 
-		Arrays.sort(sort, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return Integer.compare(x[o1], x[o2]);
-			}
-		});
+		Arrays.sort(p);
 
-		int min = 800000001;
-		for (int i = 0; i < n; i++) {
-			for (int j = i + 1; j < n && (x[sort[j]] - x[sort[i]]) * (x[sort[j]] - x[sort[i]]) < min; j++) {
-				if ((y[sort[j]] - y[sort[i]]) * (y[sort[j]] - y[sort[i]]) < min) {
-					int temp = (x[sort[j]] - x[sort[i]]) * (x[sort[j]] - x[sort[i]])
-							+ (y[sort[j]] - y[sort[i]]) * (y[sort[j]] - y[sort[i]]);
-					min = Math.min(min, temp);
+		int min = (p[0] / 20001 - p[1] / 20001) * (p[0] / 20001 - p[1] / 20001);
+		min += (p[0] % 20001 - p[1] % 20001) * (p[0] % 20001 - p[1] % 20001);
+		for (int i = 0; i < p.length - 1; i++) {
+			int x1 = p[i] / 20001, y1 = p[i] % 20001;
+			for (int j = i + 1; j < p.length; j++) {
+				int x2 = p[j] / 20001, y2 = p[j] % 20001;
+
+				int len = (x1 - x2) * (x1 - x2);
+				if (len >= min) {
+					break;
+				} else {
+					len += (y1 - y2) * (y1 - y2);
+					if (len < min) {
+						min = len;
+					}
 				}
 			}
 		}
