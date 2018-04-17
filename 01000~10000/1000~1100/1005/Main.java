@@ -20,7 +20,7 @@ public class Main {
 
 			for (int j = 1; j < n + 1; j++) {
 				d[j] = sc.nextInt();
-				min[j] = 0;
+				min[j] = -1;
 			}
 
 			List<List<Integer>> map = new ArrayList<List<Integer>>();
@@ -42,7 +42,7 @@ public class Main {
 	}
 
 	public static int solve(List<List<Integer>> map, int[] d, int[] min, int n, int w) {
-		if (min[w] > 0) {
+		if (min[w] >= 0) {
 			return min[w];
 		} else if (map.get(w).size() == 0) {
 			min[w] = d[w];
