@@ -1,72 +1,60 @@
 package baekjoon;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		Scanner sc = new Scanner(System.in);
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		Node root = new Node();
+		int[] node = new int[10000];
+		int[] left = new int[10000];
+		int[] right = new int[10000];
 
-		while (sc.hasNext()) {
-			root.list.add(sc.nextInt());
-		}
-		
-		root.init();
-		
-		postOrder(root, bw);
+		Arrays.fill(node, -1);
+		Arrays.fill(left, -1);
+		Arrays.fill(right, -1);
 
-		bw.flush();
-	}
+		int len = 0;
 
-	public static void postOrder(Node node, BufferedWriter bw) throws IOException {
-		if (node.left != null) {
-			postOrder(node.left, bw);
-		}
-		if (node.right != null) {
-			postOrder(node.right, bw);
-		}
-		bw.write(node.val + "\n");
-	}
-}
+		while (sc.hasNextLine()) {
+			String temp = sc.nextLine();
 
-class Node {
-	ArrayList<Integer> list = new ArrayList<Integer>();
-	Node left = null;
-	Node right = null;
-	int val = 0;
-
-	public void init() {
-		val = list.get(0);
-		list.remove(0);
-		if (list.size() > 0) {
-			if (list.get(0) > val) {
-				this.right = new Node();
-				right.list.addAll(list);
-				right.init();
-			} else if (list.get(list.size() - 1) < val) {
-				this.left = new Node();
-				left.list.addAll(list);
-				left.init();
-			} else {
-				this.left = new Node();
-				this.right = new Node();
-				for (int i = 0; i < list.size(); i++) {
-					if (list.get(i) < val) {
-						left.list.add(list.get(i));
-					} else {
-						right.list.add(list.get(i));
-					}
-				}
-				left.init();
-				right.init();
+			if (temp.length() <= 0) {
+				break;
 			}
-			list.clear();
+
+			node[len] = Integer.parseInt(temp);
+			int idx = 0;
+			while (node[idx] != node[len]) {
+				if (node[idx] < node[len]) {
+					if (right[idx] == -1) {
+						right[idx] = len;
+					}
+
+					idx = right[idx];
+				} else {
+					if (left[idx] == -1) {
+						left[idx] = len;
+					}
+
+					idx = left[idx];
+				}
+			}
+			len++;
 		}
+
+		new Main().postorder(node, left, right, 0);
+	}
+
+	public void postorder(int[] node, int[] left, int[] right, int now) {
+		if (left[now] != -1) {
+			postorder(node, left, right, left[now]);
+		}
+		if (right[now] != -1) {
+			postorder(node, left, right, right[now]);
+		}
+		System.out.println(node[now]);
 	}
 }
