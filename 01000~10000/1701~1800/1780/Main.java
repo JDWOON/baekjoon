@@ -13,9 +13,19 @@ public class Main {
 		int[] cnt = { 0, 0, 0 };
 
 		for (int i = 0; i < n; i++) {
-			String[] temp = br.readLine().split(" ");
+			String s = br.readLine();
+			int idx = 0;
 			for (int j = 0; j < n; j++) {
-				p[i][j] = Integer.parseInt(temp[j]);
+				if (s.charAt(idx) == '0') {
+					p[i][j] = 0;
+					idx += 2;
+				} else if (s.charAt(idx) == '1') {
+					p[i][j] = 1;
+					idx += 2;
+				} else {
+					p[i][j] = -1;
+					idx += 3;
+				}
 			}
 		}
 
