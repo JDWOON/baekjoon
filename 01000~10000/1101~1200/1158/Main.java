@@ -1,33 +1,55 @@
 package baekjoon;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Scanner sc = new Scanner(System.in);
 
 		int n = sc.nextInt();
 		int m = sc.nextInt();
 
-		Deque<Integer> dq = new ArrayDeque();
-		for (int i = 0; i < n; i++) {
-			dq.addLast(i + 1);
+		new Main().solve(n, m);
+	}
+
+	public class Linked {
+		int val;
+		Linked next;
+	}
+
+	public void solve(int n, int m) throws IOException {
+		Linked root = new Linked();
+		root.val = 1;
+		Linked idx = root;
+
+		for (int i = 1; i < n; i++) {
+			idx.next = new Linked();
+			idx = idx.next;
+			idx.val = i + 1;
 		}
 
-		String s = "<";
-		while (dq.size() > 0) {
-			if (dq.size() > 1) {
-				for (int i = 1; i < m; i++) {
-					int now = dq.pollFirst();
-					dq.addLast(now);
-				}
-				s += dq.pollFirst() + ", ";
-			} else {
-				s += dq.pollFirst() + ">";
+		idx.next = root;
+
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		bw.write("<");
+
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m - 1; j++) {
+				idx = idx.next;
 			}
+
+			if (i > 0) {
+				bw.write(", ");
+			}
+
+			bw.write("" + idx.next.val);
+			idx.next = idx.next.next;
 		}
-		System.out.println(s);
+
+		bw.write(">");
+		bw.flush();
 	}
 }
