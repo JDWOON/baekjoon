@@ -1,67 +1,85 @@
-package baekjoon;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
+	private final static int MAX_TIME = 500 * 10000;
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		StringTokenizer st = new StringTokenizer(br.readLine());
+
 		int n = Integer.parseInt(st.nextToken());
 		int m = Integer.parseInt(st.nextToken());
 
-		ArrayList<Integer>[] list = new ArrayList[n + 1];
-		for (int i = 0; i < list.length; i++) {
-			list[i] = new ArrayList<Integer>();
-		}
+		Edge[] edges = new Edge[m];
 
 		for (int i = 0; i < m; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			int w = Integer.parseInt(st.nextToken());
-			list[a].add((w + 10000) * 10000 + b);
+			st = new StringTokenizer(br.readLine());
+
+			int a = Integer.parseInt(st.nextToken()) - 1;
+			int b = Integer.parseInt(st.nextToken()) - 1;
+			int c = Integer.parseInt(st.nextToken());
+
+			edges[i] = new Edge(a, b, c);
 		}
 
-		int[] min = new int[n + 1];
-		Arrays.fill(min, Integer.MAX_VALUE);
-		min[1] = 0;
+		int[] result = new int[n];
+		Arrays.fill(result, MAX_TIME);
+		result[0] = 0;
 
-		new Main().solve(list, min, 1, 0);
+		solve(edges, result);
 
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		if (min[0] < 0) {
-			bw.write("-1");
+
+		if (result[0] == -1) {
+			bw.write(-1 + "\n");
 		} else {
-			for (int i = 2; i < min.length; i++) {
-				if (min[i] == Integer.MAX_VALUE) {
-					bw.write("-1\n");
+			for (int i = 1; i < result.length; i++) {
+				if (result[i] == MAX_TIME) {
+					bw.write(-1 + "\n");
 				} else {
-					bw.write(min[i] + "\n");
+					bw.write(result[i] + "\n");
 				}
 			}
 		}
+
 		bw.flush();
 	}
 
-	public void solve(ArrayList<Integer>[] list, int[] min, int now, int time) {
-		for (int i = 0; i < list[now].size(); i++) {
-			int next = list[now].get(i) % 10000;
-			int weight = list[now].get(i) / 10000 - 10000;
-			if (min[next] < 0 && min[next] > time + weight) {
-				min[0] = -1;
-				return;
-			} else if (min[next] > time + weight) {
-				min[next] = time + weight;
-				solve(list, min, next, time + weight);
+	public static void solve(Edge[] edges, int[] result) {
+		for (int i = 0; i < result.length; i++) {
+			for (int j = 0; j < edges.length; j++) {
+				if (result[edges[j].source] < MAX_TIME
+						&& result[edges[j].dest] > result[edges[j].source] + edges[j].weight) {
+					result[edges[j].dest] = result[edges[j].source] + edges[j].weight;
+				}
 			}
+		}
+
+		for (int i = 0; i < edges.length; i++) {
+			if (result[edges[i].source] < MAX_TIME
+					&& result[edges[i].dest] > result[edges[i].source] + edges[i].weight) {
+				result[0] = -1;
+				return;
+			}
+		}
+	}
+
+	public static class Edge {
+		int source;
+		int dest;
+		int weight;
+
+		Edge(int source, int dest, int weight) {
+			this.source = source;
+			this.dest = dest;
+			this.weight = weight;
 		}
 	}
 }
