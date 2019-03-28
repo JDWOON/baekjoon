@@ -1,8 +1,8 @@
-package baekjoon;
-
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
@@ -11,51 +11,62 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		StringTokenizer st = new StringTokenizer(br.readLine());
+
 		int n = Integer.parseInt(st.nextToken());
 		int m = Integer.parseInt(st.nextToken());
-		ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
-		for (int i = 0; i < n + 1; i++) {
-			list.add(new ArrayList<Integer>());
+
+		ArrayList<Integer>[] edges = new ArrayList[n + 1];
+		int[] result = new int[n + 1];
+
+		for (int i = 1; i < n + 1; i++) {
+			edges[i] = new ArrayList<Integer>();
+			result[i] = 0;
 		}
 
 		for (int i = 0; i < m; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
+			st = new StringTokenizer(br.readLine());
+
 			int a = Integer.parseInt(st.nextToken());
 			int b = Integer.parseInt(st.nextToken());
-			list.get(b).add(a);
+
+			edges[a].add(b);
 		}
 
-		int[] cnt = new int[n + 1];
-		int max = 0;
-		for (int i = 1; i <= n; i++) {
-			cnt[i] = new Main().solve(list, i);
-			max = Math.max(max, cnt[i]);
+		for (int i = 1; i < n + 1; i++) {
+			boolean[] visit = new boolean[n + 1];
+			Arrays.fill(visit, false);
+
+			solve(edges, visit, result, i);
 		}
 
-		for (int i = 1; i <= n; i++) {
-			if (max == cnt[i]) {
-				System.out.print(i + " ");
+		int maxHack = 0;
+		for (int i = 1; i < n + 1; i++) {
+			maxHack = Math.max(maxHack, result[i]);
+		}
+
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+		for (int i = 1; i < n + 1; i++) {
+			if (result[i] == maxHack) {
+				bw.write(i + " ");
 			}
 		}
+
+		bw.flush();
 	}
 
-	public int solve(ArrayList<ArrayList<Integer>> list, int root) {
-		boolean[] visit = new boolean[list.size()];
-		Arrays.fill(visit, false);
-		return dfs(list, visit, root);
-	}
-
-	public int dfs(ArrayList<ArrayList<Integer>> list, boolean[] visit, int now) {
+	public static void solve(ArrayList<Integer>[] edges, boolean[] visit, int[] result, int now) {
 		if (visit[now]) {
-			return 0;
+			return;
 		} else {
 			visit[now] = true;
-			int val = 1;
-			for (int i = 0; i < list.get(now).size(); i++) {
-				val += dfs(list, visit, list.get(now).get(i));
+			result[now]++;
+			for (int prev : edges[now]) {
+				if (!visit[prev]) {
+					solve(edges, visit, result, prev);
+				}
 			}
-			return val;
 		}
 	}
 }
