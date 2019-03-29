@@ -1,100 +1,107 @@
-package baekjoon;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		int n = Integer.parseInt(br.readLine());
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		int[] x = new int[n];
-		int[] y = new int[n];
-		Integer[] idx = new Integer[n];
+		int n = Integer.parseInt(st.nextToken());
 
-		int xMin = 0;
+		Dot[] dots = new Dot[n];
+
+		Dot d = new Dot(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
 		for (int i = 0; i < n; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			x[i] = Integer.parseInt(st.nextToken());
-			y[i] = Integer.parseInt(st.nextToken());
-			idx[i] = i;
-			if (x[i] < x[xMin]) {
-				xMin = i;
-			} else if (x[i] == x[xMin] && y[i] > y[xMin]) {
-				xMin = i;
+			st = new StringTokenizer(br.readLine());
+
+			long x = Long.parseLong(st.nextToken());
+			long y = Long.parseLong(st.nextToken());
+
+			dots[i] = new Dot(x, y);
+
+			if (dots[i].x < d.x) {
+				d = new Dot(dots[i].x, dots[i].y);
+			} else if (dots[i].x == d.x && dots[i].y < d.y) {
+				d = new Dot(dots[i].x, dots[i].y);
 			}
 		}
 
-		slopeSort(x, y, idx, xMin);
-
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		bw.write(solve(x, y, idx) + "\n");
+
+		bw.write(solve(dots, d) + "\n");
+
 		bw.flush();
 	}
 
-	public static int solve(int[] x, int[] y, Integer[] idx) {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		list.add(0);
-		list.add(1);
-		for (int i = 2; i < idx.length + 1; i++) {
-			long ax, ay, bx, by;
-			int prev, now, next = 0;
+	public static int solve(Dot[] dots, Dot d) {
 
-			while (list.size() > 1) {
-				now = list.get(list.size() - 1);
-				prev = list.get(list.size() - 2);
-				next = i % idx.length;
-
-				ax = (x[idx[now]] - x[idx[prev]]);
-				ay = (y[idx[now]] - y[idx[prev]]);
-				bx = (x[idx[next]] - x[idx[now]]);
-				by = (y[idx[next]] - y[idx[now]]);
-
-				if (ax * by - ay * bx <= 0) {
-					list.remove(list.size() - 1);
-				} else {
-					break;
-				}
-			}
-
-			if (next > 0) {
-				list.add(next);
-			}
-		}
-
-		return list.size();
-	}
-
-	public static void slopeSort(int[] x, int[] y, Integer[] idx, int xMin) {
-		Arrays.sort(idx, new Comparator<Integer>() {
+		final Dot std = new Dot(d.x, d.y);
+		Arrays.sort(dots, new Comparator<Dot>() {
 			@Override
-			public int compare(Integer o1, Integer o2) {
-				if (xMin == o1) {
-					return -1;
-				} else if (xMin == o2) {
+			public int compare(Dot o1, Dot o2) {
+				if (std.x == o1.x && std.x == o2.x) {
+					return Long.compare(o2.y, o1.y);
+				} else if (std.x == o1.x) {
 					return 1;
+				} else if (std.x == o2.x) {
+					return -1;
 				} else {
-					long ax = x[o1] - x[xMin];
-					long ay = y[o1] - y[xMin];
-					long bx = x[o2] - x[xMin];
-					long by = y[o2] - y[xMin];
-
-					if (ay * bx - ax * by == 0) {
-						return Long.compare(Math.abs(ax), Math.abs(ay));
-					} else {
-						return (ay * bx - ax * by) < 0 ? -1 : 1;
-					}
+					return Long.compare((std.y - o1.y) * (std.x - o2.x),
+							(std.y - o2.y) * (std.x - o1.x));
 				}
 			}
 		});
+
+		Stack<Dot> dst = new Stack<Dot>();
+		dst.push(std);
+
+		for (Dot dot : dots) {
+			if (dst.size() == 1) {
+				dst.push(dot);
+			} else {
+				while (true) {
+					Dot top = dst.pop();
+					Dot prev = dst.peek();
+
+					Dot vA = new Dot(top.x - prev.x, top.y - prev.y);
+					Dot vB = new Dot(dot.x - prev.x, dot.y - prev.y);
+
+					long cp = (vA.x * vB.y) - (vA.y * vB.x);
+					if (cp > 0) {
+						dst.push(top);
+						dst.push(dot);
+						break;
+					} else if (cp == 0) {
+						dst.push(dot);
+						break;
+					}
+				}
+			}
+		}
+
+		if (dst.size() > 2) {
+			dst.pop();
+		}
+
+		return dst.size();
+	}
+
+	public static class Dot {
+		long x;
+		long y;
+
+		Dot(long x, long y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 }
