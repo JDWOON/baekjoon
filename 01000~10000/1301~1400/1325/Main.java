@@ -5,67 +5,103 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 public class Main {
+	static int n, m;
+	static int[][] list;
+	static int[] listSize;
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
 		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		int n = Integer.parseInt(st.nextToken());
-		int m = Integer.parseInt(st.nextToken());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+//		n = 10000;
+//		m = 100000;
 
-		ArrayList<Integer>[] edges = new ArrayList[n + 1];
-		int[] result = new int[n + 1];
-
-		for (int i = 1; i < n + 1; i++) {
-			edges[i] = new ArrayList<Integer>();
-			result[i] = 0;
+		listSize = new int[n];
+		Arrays.fill(listSize, 0);
+		list = new int[n][];
+		for (int i = 0; i < n; i++) {
+			list[i] = new int[5];
 		}
 
 		for (int i = 0; i < m; i++) {
 			st = new StringTokenizer(br.readLine());
 
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
+			int a = Integer.parseInt(st.nextToken()) - 1;
+			int b = Integer.parseInt(st.nextToken()) - 1;
 
-			edges[a].add(b);
-		}
+//			int a = 0, b = 0;
+//			while (a == b || checkContains(a, b)) {
+//				a = (int) (Math.random() * n);
+//				b = (int) (Math.random() * n);
+//			}
 
-		for (int i = 1; i < n + 1; i++) {
-			boolean[] visit = new boolean[n + 1];
-			Arrays.fill(visit, false);
-
-			solve(edges, visit, result, i);
-		}
-
-		int maxHack = 0;
-		for (int i = 1; i < n + 1; i++) {
-			maxHack = Math.max(maxHack, result[i]);
-		}
-
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
-		for (int i = 1; i < n + 1; i++) {
-			if (result[i] == maxHack) {
-				bw.write(i + " ");
+			if (listSize[b] == list[b].length) {
+				list[b] = Arrays.copyOf(list[b], list[b].length + 10);
 			}
+
+			list[b][listSize[b]] = a;
+			listSize[b]++;
+		}
+
+		for (int i : solve()) {
+			bw.write((i + 1) + " ");
 		}
 
 		bw.flush();
 	}
 
-	public static void solve(ArrayList<Integer>[] edges, boolean[] visit, int[] result, int now) {
-		if (visit[now]) {
-			return;
-		} else {
-			visit[now] = true;
-			result[now]++;
-			for (int prev : edges[now]) {
-				if (!visit[prev]) {
-					solve(edges, visit, result, prev);
-				}
+	public static boolean checkContains(int a, int b) {
+		for (int i = 0; i < listSize[b]; i++) {
+			if (list[b][i] == a) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	static boolean[] visit;
+	static int cnt;
+
+	public static ArrayList<Integer> solve() {
+		int maxVal = 0;
+		ArrayList<Integer> maxList = new ArrayList<Integer>();
+
+		visit = new boolean[n];
+
+		for (int i = 0; i < n; i++) {
+			Arrays.fill(visit, false);
+			cnt = 0;
+
+			dfs(i);
+
+			if (cnt > maxVal) {
+				maxVal = cnt;
+				maxList.clear();
+				maxList.add(i);
+			} else if (cnt == maxVal) {
+				maxList.add(i);
+			}
+		}
+
+		return maxList;
+	}
+
+	public static void dfs(int now) {
+		cnt++;
+		visit[now] = true;
+
+		for (int i = 0; i < listSize[now]; i++) {
+			if (!visit[list[now][i]]) {
+				dfs(list[now][i]);
 			}
 		}
 	}
