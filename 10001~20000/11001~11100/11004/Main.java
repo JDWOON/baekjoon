@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.StringTokenizer;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -16,58 +15,47 @@ public class Main {
 
 		int n = Integer.parseInt(st.nextToken());
 		int k = Integer.parseInt(st.nextToken());
-
-		int[] p = new int[n];
+		int[] arr = new int[n];
 
 		st = new StringTokenizer(br.readLine());
 
 		for (int i = 0; i < n; i++) {
-			p[i] = Integer.parseInt(st.nextToken());
+			arr[i] = Integer.parseInt(st.nextToken());
 		}
 
-		bw.write(solve(p, 0, n - 1, k - 1) + "\n");
+		mergeSort(arr, 0, n - 1);
+
+		bw.write(arr[k - 1] + "\n");
+
 		bw.flush();
 	}
 
-	public static int solve(int[] list, int left, int right, int k) {
-		if (left == right) {
-			return list[left];
-		}
+	public static void mergeSort(int[] p, int l, int r) {
+		if (l < r) {
+			int mid = (l + r) / 2;
 
-		Random r = new Random();
-		int pivot = left + r.nextInt(right - left);
-		pivot = partition(list, left, right, pivot);
+			mergeSort(p, l, mid);
+			mergeSort(p, mid + 1, r);
 
-		if (k == pivot) {
-			return list[k];
-		} else if (k < pivot) {
-			return solve(list, left, pivot - 1, k);
-		} else {
-			return solve(list, pivot + 1, right, k);
-		}
-	}
+			int[] lArr = Arrays.copyOfRange(p, l, mid + 1);
+			int[] rArr = Arrays.copyOfRange(p, mid + 1, r + 1);
+			int a = 0, b = 0;
 
-	public static int partition(int[] list, int left, int right, int pivot) {
-		int val = list[pivot];
-
-		int temp = list[pivot];
-		list[pivot] = list[right];
-		list[right] = temp;
-
-		int now = left;
-		for (int i = left; i < right; i++) {
-			if (list[i] <= val) {
-				temp = list[i];
-				list[i] = list[now];
-				list[now] = temp;
-				now++;
+			for (int i = l; i < r + 1; i++) {
+				if (a == lArr.length) {
+					p[i] = rArr[b];
+					b++;
+				} else if (b == rArr.length) {
+					p[i] = lArr[a];
+					a++;
+				} else if (lArr[a] < rArr[b]) {
+					p[i] = lArr[a];
+					a++;
+				} else {
+					p[i] = rArr[b];
+					b++;
+				}
 			}
 		}
-
-		temp = list[now];
-		list[now] = list[right];
-		list[right] = temp;
-
-		return now;
 	}
 }
