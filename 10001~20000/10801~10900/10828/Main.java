@@ -1,40 +1,48 @@
 package baekjoon;
 
-import java.util.Scanner;
-import java.util.Stack;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.LinkedList;
 
 public class Main {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		int n = Integer.parseInt(sc.nextLine());
-		Stack<Integer> st = new Stack<Integer>();
+		LinkedList<Integer> list = new LinkedList<Integer>();
+
+		int n = Integer.parseInt(br.readLine());
 
 		for (int i = 0; i < n; i++) {
-			String[] c = sc.nextLine().split(" ");
-			if (c.length == 2) {
-				st.push(Integer.parseInt(c[1]));
-			} else if (c[0].equals("pop")) {
-				if (st.size() == 0) {
-					System.out.println(-1);
-				} else {
-					System.out.println(st.pop());
-				}
-			} else if (c[0].equals("top")) {
-				if (st.size() == 0) {
-					System.out.println(-1);
-				} else {
-					System.out.println(st.peek());
-				}
-			} else if (c[0].equals("size")) {
-				System.out.println(st.size());
-			} else if (c[0].equals("empty")) {
-				if (st.isEmpty()) {
-					System.out.println(1);
-				} else {
-					System.out.println(0);
-				}
+			String[] s = br.readLine().split(" ");
+			switch (s[0]) {
+			case "push":
+				list.add(Integer.parseInt(s[1]));
+				break;
+			case "pop":
+				bw.write(list.isEmpty() ? "-1" : Integer.toString(list.removeLast()));
+				bw.write("\n");
+				break;
+			case "size":
+				bw.write(Integer.toString(list.size()));
+				bw.write("\n");
+				break;
+			case "empty":
+				bw.write(list.isEmpty() ? "1" : "0");
+				bw.write("\n");
+				break;
+			case "top":
+				bw.write(list.isEmpty() ? "-1" : Integer.toString(list.getLast()));
+				bw.write("\n");
+				break;
+			default:
+				break;
 			}
 		}
+
+		bw.flush();
 	}
 }
