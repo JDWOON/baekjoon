@@ -1,31 +1,52 @@
 package baekjoon;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.LinkedList;
 
 public class Main {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		Deque<Integer> dq = new ArrayDeque();
+		LinkedList<Integer> list = new LinkedList<Integer>();
 
-		int n = Integer.parseInt(sc.nextLine());
+		int n = Integer.parseInt(br.readLine());
+
 		for (int i = 0; i < n; i++) {
-			String[] s = sc.nextLine().split(" ");
-			if (s[0].equals("push")) {
-				dq.addLast(Integer.parseInt(s[1]));
-			} else if (s[0].equals("pop")) {
-				System.out.println(dq.isEmpty() ? -1 : dq.pollFirst());
-			} else if (s[0].equals("size")) {
-				System.out.println(dq.size());
-			} else if (s[0].equals("empty")) {
-				System.out.println(dq.isEmpty() ? 1 : 0);
-			} else if (s[0].equals("front")) {
-				System.out.println(dq.isEmpty() ? -1 : dq.getFirst());
-			} else if (s[0].equals("back")) {
-				System.out.println(dq.isEmpty() ? -1 : dq.getLast());
+			String[] s = br.readLine().split(" ");
+			switch (s[0]) {
+			case "push":
+				list.add(Integer.parseInt(s[1]));
+				break;
+			case "pop":
+				bw.write(list.isEmpty() ? "-1" : Integer.toString(list.pop()));
+				bw.write("\n");
+				break;
+			case "size":
+				bw.write(Integer.toString(list.size()));
+				bw.write("\n");
+				break;
+			case "empty":
+				bw.write(list.isEmpty() ? "1" : "0");
+				bw.write("\n");
+				break;
+			case "front":
+				bw.write(list.isEmpty() ? "-1" : Integer.toString(list.peek()));
+				bw.write("\n");
+				break;
+			case "back":
+				bw.write(list.isEmpty() ? "-1" : Integer.toString(list.peekLast()));
+				bw.write("\n");
+				break;
+			default:
+				break;
 			}
 		}
+
+		bw.flush();
 	}
 }
